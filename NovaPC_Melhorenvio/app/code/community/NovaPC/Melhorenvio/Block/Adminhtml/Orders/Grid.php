@@ -22,7 +22,12 @@ class NovaPC_Melhorenvio_Block_Adminhtml_Orders_Grid extends Mage_Adminhtml_Bloc
     
     protected function _prepareCollection() 
     {
-        Mage::helper('melhorenvio')->syncOrders();
+        /**
+         * @author Mageshop <vitor@tryideas.com.br>
+         * Essa função será executada por cron
+         * Melhorando o desepenho da loja, deixando uma tarefa pesada sendo processada em segundo plano.
+         */
+        // Mage::helper('melhorenvio')->syncOrders();
         $collection = Mage::getModel('melhorenvio/orders')->getCollection()->getCustomOrders();
         $this->setCollection($collection);
         $this->getColumn('massaction')->setUseIndex(true);         

@@ -358,20 +358,33 @@ class NovaPC_Melhorenvio_Helper_Data extends Mage_Core_Helper_Abstract
 		}
 	}
 
-	public function syncOrders($order = null){
+	public function syncOrders($order = null, $currentPage = null, $pageSize = null){
 		$collection = Mage::getModel('melhorenvio/orders')->getCollection();
-
+    
 		if($order == null){
-			$collection = $collection->getOrdersByStatus("Erro");
+			// Filtrar registros onde 'url_etiqueta' é NULL e com status "Erro"
+			$collection->addFieldToFilter('url_etiqueta', array('null' => true))
+					   ->addFieldToFilter('status', "Erro")
+					   ->setCurPage($currentPage)
+					   ->setPageSize($pageSize);
+
+			if($currentPage !== null){
+                // Aplicar essas informações à coleção
+                $collection->setCurPage($currentPage);
+            }
+            if($pageSize !== null){
+                // Aplicar essas informações à coleção
+                $collection->setPageSize($pageSize);
+            }
+        
 		}else{
 			$collection->addFieldToFilter("increment_id", $order->getData('increment_id'))
-			->addFieldToFilter("status", "Erro")->getFirstItem();
-		}
+ 			->addFieldToFilter("status", "Erro")->getFirstItem();
+ 		}
 
 		if($order != null && $collection->count() == 0){
 			return $order->getData("me_status");
 		}
-
 		
 		foreach ($collection as $order){
 			$url = $this->_url_init."api/v2/me/shipment/preview";
@@ -390,7 +403,12 @@ class NovaPC_Melhorenvio_Helper_Data extends Mage_Core_Helper_Abstract
 			if($collection->count() == 1){
 				return $order->getData("status");
 			}
+
+			unset($order);
 		}
+		
+		// retorno exclusivo para NovaPC_Melhorenvio_Model_Cron
+		return $collection->count() > 0;
 	}
 
 	public function isPrivateCarrier($transportadora){
