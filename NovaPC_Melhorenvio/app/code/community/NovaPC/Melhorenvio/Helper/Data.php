@@ -364,19 +364,17 @@ class NovaPC_Melhorenvio_Helper_Data extends Mage_Core_Helper_Abstract
 		if($order == null){
 			// Filtrar registros onde 'url_etiqueta' é NULL e com status "Erro"
 			$collection->addFieldToFilter('url_etiqueta', array('null' => true))
-					   ->addFieldToFilter('status', "Erro")
-					   ->setCurPage($currentPage)
-					   ->setPageSize($pageSize);
+					   ->addFieldToFilter('status', "Erro");
 
-			if($currentPage !== null){
-                // Aplicar essas informações à coleção
-                $collection->setCurPage($currentPage);
-            }
-            if($pageSize !== null){
-                // Aplicar essas informações à coleção
-                $collection->setPageSize($pageSize);
-            }
-        
+			$totalRecords = $collection->getSize();
+			$totalPages = ceil($totalRecords / $pageSize);
+			
+			if ($currentPage > $totalPages) {
+				return false;
+			} else {
+				$collection->setCurPage($currentPage)->setPageSize($pageSize);
+			}
+
 		}else{
 			$collection->addFieldToFilter("increment_id", $order->getData('increment_id'))
  			->addFieldToFilter("status", "Erro")->getFirstItem();
@@ -403,8 +401,6 @@ class NovaPC_Melhorenvio_Helper_Data extends Mage_Core_Helper_Abstract
 			if($collection->count() == 1){
 				return $order->getData("status");
 			}
-
-			unset($order);
 		}
 		
 		// retorno exclusivo para NovaPC_Melhorenvio_Model_Cron
