@@ -138,4 +138,18 @@
       </melhorenvio>
     </carriers>
   </default>
+
+  <crontab>
+    <jobs>
+      <melhorenvio_mageshop_jobs>
+        <schedule>
+          <cron_expr>0 */4 * * *</cron_expr>
+        </schedule>
+        <run>
+          <model>melhorenvio/cron::jobs</model>
+        </run>
+      </melhorenvio_mageshop_jobs>
+    </jobs>
+  </crontab>
+  
 </config> 
